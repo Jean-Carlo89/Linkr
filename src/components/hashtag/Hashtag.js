@@ -27,7 +27,7 @@ export default function OtherUsersPosts({goToLink, openMap}){
 
     /*Logics of infinite Scroller*/ 
   
-  const[hasMore,setHasMore] = useState(true)
+  const[hasMore,setHasMore] = useState(false)
 
     const config = {
         headers:{
@@ -38,7 +38,7 @@ export default function OtherUsersPosts({goToLink, openMap}){
     useEffect(()=>{
         updateHashtagPosts()
         
-    },[])
+    },[hashtag])
 
     function updateHashtagPosts(newVal){ 
        const getPosts = axios.get(`https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/hashtags/${newVal || hashtag}/posts`,config)
@@ -59,6 +59,7 @@ export default function OtherUsersPosts({goToLink, openMap}){
             })   
             setLikedPosts(sharpedHeart);
             setOlderLikes(sharpedHeart);
+            setHasMore(true)
 
         })
 
@@ -91,15 +92,12 @@ export default function OtherUsersPosts({goToLink, openMap}){
             return
         }
 
-        const getNewPosts =  axios.get(`https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/hashtags/${hashtag}/posts?offset=20`,config)
-
+     const getNewPosts =  axios.get(`https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/hashtags/${hashtag}/posts?offset=${hashtagPosts.length}`,config)
         getNewPosts.then((response)=>{
             
             
             if(response.data.posts.length<10){
                 setHasMore(false)
-            }else{
-                setHasMore(true)
             }
             
             const scrollPosts = response.data.posts
@@ -149,7 +147,7 @@ export default function OtherUsersPosts({goToLink, openMap}){
                         loader={ <div className="loader" key={0}>Loading More Posts...</div>}
                         threshold={1}
                         className='Scroller'
-                        initialLoad={false}
+                        
                     > 
                         <Posts noPostsMessage={'Não há posts dessa hashtag no momento'}
                                     serverLoading={serverLoading}

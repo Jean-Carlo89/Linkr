@@ -44,6 +44,9 @@ export default function MyLikes({goToLink, openMap}){
         getPosts.then((response)=>{
             const newArray = response.data.posts
             
+            if(newArray.length===0){
+                setHasMore(false)
+            }
            
             setAllPosts(newArray)
             setServerLoading(false)
@@ -85,33 +88,36 @@ export default function MyLikes({goToLink, openMap}){
 
 
     function scrollPage(lastPost){
-        
+        if(allPosts.length<10){
+            return
+        }
 
         if(allPosts[lastPost]===undefined){
             return
         }
 
-        const getNewPosts = axios.get('https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/liked?offset=20',config)
+        if(allPosts.length>0){
 
-        getNewPosts.then((response)=>{
+            const getNewPosts =axios.get(`https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/liked?offset=${allPosts.length}`, config)
+            getNewPosts.then((response)=>{
            
             
-            if(response.data.posts.length<10){
-                setHasMore(false)
-            }else{
-                setHasMore(true)
-            }
-            
-            const scrollPosts = response.data.posts
-            setAllPosts([...allPosts,...scrollPosts])
-           
-        })
+                    if(response.data.posts.length<10){
+                        setHasMore(false)
+                    }
+                   
+                    const scrollPosts = response.data.posts
+                    setAllPosts([...allPosts,...scrollPosts])
+                
+                })
 
-        getNewPosts.catch((responseError)=>{
+             getNewPosts.catch((responseError)=>{
             alert('houve um erro ao atualizar')
-           
+                
 
-        })
+            })
+        }
+     
 
        
     }
@@ -121,7 +127,7 @@ export default function MyLikes({goToLink, openMap}){
         
         <TimelineContainer>
             <h1>my likes</h1> 
-
+           
                 
                 <TimelineContent>
 
@@ -130,7 +136,7 @@ export default function MyLikes({goToLink, openMap}){
                         loadMore={()=>scrollPage(allPosts.length-1)}
                         hasMore={hasMore}
                         loader={<div className="loader" key={0}>Loading More Posts...</div>}
-                        threshold={1}
+                        
                         className='Scroller'
                     > 
                 

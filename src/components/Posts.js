@@ -90,7 +90,7 @@ return(
             ? <NoPostsYet>{noPostsMessage}</NoPostsYet>
             :allPosts.map((post)=>{
             return(
-                <li key={post.id} id={post.id}>
+                <li key={ post["repostId"] ? post.repostId : post.id} id={post.id}>
 
                     {post["repostedBy"] ? 
                             (<RepostIcon>
