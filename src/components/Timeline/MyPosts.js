@@ -35,15 +35,42 @@ export default function MyPosts({goToLink,openMap}){
     } 
 
     useEffect(()=>{
-        update();
+        getMyPosts();
     },[])
 
-        function update () {
-            const getPosts = axios.get(`https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/${user.user.id}/posts`,config)
 
+    function getMyPosts () {
+        const getPosts = axios.get(`https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/${user.user.id}/posts`,config)
+
+    getPosts.then((response)=>{
+         const newArray = (response.data.posts.map((m)=>({...m, toEdit: false})));
+         setMyPosts(newArray)
+        setServerLoading(false)
+        let sharpedHeart = []
+        newArray.forEach( post => {
+            post.likes.forEach(n =>{
+            if(n.userId === user.user.id){
+                sharpedHeart.push({id: post.id, likes: post.likes.length, names: post.likes.map(n => n["user.username"])})
+            }})
+        })
+        setLikedPosts(sharpedHeart);
+        setOlderLikes(sharpedHeart);
+    })
+
+    getPosts.catch((responseError)=>{
+        alert(`Houve uma falha ao obter os posts. Por favor atualize a página`)
+        return
+    })
+}
+
+        function update () {
+           
+           const getPosts = axios.get(`https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/${user.user.id}/posts`,config)
         getPosts.then((response)=>{
+            
              const newArray = (response.data.posts.map((m)=>({...m, toEdit: false})));
-             setMyPosts(newArray)
+            
+            setMyPosts(newArray)
             setServerLoading(false)
             let sharpedHeart = []
             newArray.forEach( post => {
@@ -54,6 +81,7 @@ export default function MyPosts({goToLink,openMap}){
             })
             setLikedPosts(sharpedHeart);
             setOlderLikes(sharpedHeart);
+            setHasMore(true)
         })
 
         getPosts.catch((responseError)=>{
@@ -97,12 +125,20 @@ export default function MyPosts({goToLink,openMap}){
             return
         }
 
-        const getNewPosts = axios.get(`https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/${user.user.id}/posts?offset=20`,config)
-
+        let postId;
+        if(myPosts[0]["repostId"]){
+            postId=`${myPosts[myPosts.length - 1].repostId}`
+        }else{
+            postId=`${myPosts[myPosts.length - 1].id}`
+        }
+        
+       const getNewPosts = axios.get(`https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/${user.user.id}/posts?offset=${myPosts.length}`,config)
+       
         getNewPosts.then((response)=>{
            
-
+           
             if(response.data.posts.length<10){
+                
                 setHasMore(false)
             }else{
                 setHasMore(true)
@@ -117,6 +153,7 @@ export default function MyPosts({goToLink,openMap}){
 
         getNewPosts.catch((responseError)=>{
             alert('houve um erro ao atualizar')
+           
             
         })
 
@@ -130,6 +167,7 @@ export default function MyPosts({goToLink,openMap}){
         <TimelineContainer>
             <Title>
                 <h1>my posts</h1>
+                
             </Title> 
                 
                 <TimelineContent>

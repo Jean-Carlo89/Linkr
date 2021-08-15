@@ -3,7 +3,7 @@ import UserContext from '../UserContext';
 import axios from 'axios';
 import {useHistory} from 'react-router-dom';
 import TrendingList from '../hashtag/TrendingList';
-
+import useInterval from 'react-useinterval';
 
 import styled from 'styled-components';
 
@@ -21,7 +21,7 @@ import Posts from '../Posts'
 import {Title,TimelineContainer,Container,TimelineContent,} from '../timelineStyledComponents'
 
 /* Import UseInterval custom hook*/
-import UseInterval from '../UseInterval'
+//import UseInterval from '../UseInterval'
 
 /*InfiniteScroller*/
 import InfiniteScroll from 'react-infinite-scroller';
@@ -75,18 +75,30 @@ export default function Timeline({goToLink, openMap}){
         getNumberofFollowing.then((response) => setNumberofFollowing(response.data.users))
     },[])
 
-    UseInterval(() => {
-    
+    useInterval( () => {
         
-        const getNewPosts = axios.get(`https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/following/posts?earlierThan=${allPosts[0].id}`,config)
+        let postId;
+        if(allPosts[0]["repostId"]){
+            postId=`${allPosts[0].repostId}`
+        }else{
+            postId=`${allPosts[0].id}`
+        }
+        
+        
+        const getNewPosts =  axios.get(`https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/following/posts?earlierThan=${postId}`,config)
 
     
         getNewPosts.then((response)=>{
            
-            const newerPosts = response.data.posts
-            const newTimeline=newerPosts.concat(allPosts)
-            
-            setAllPosts([...newTimeline])
+    
+            if(response.data.posts.length===0){
+                return
+            }
+            if(response.data.posts !== undefined){
+                const datas = response.data.posts
+                
+                setAllPosts([...datas,...allPosts]);
+            } 
          })
             
 
@@ -114,6 +126,7 @@ export default function Timeline({goToLink, openMap}){
             })
             setLikedPosts(sharpedHeart);
             setOlderLikes(sharpedHeart);
+            setHasMore(true)
 
         })
 
@@ -122,7 +135,7 @@ export default function Timeline({goToLink, openMap}){
             return
         })
 
-        setHasMore(true)
+        
     }
 
     function sendToHashtag(val){
@@ -146,7 +159,9 @@ export default function Timeline({goToLink, openMap}){
 
     
     function scrollPage(lastPost){
-        
+        if(serverLoading===true){
+            return
+        }
 
         if(allPosts[lastPost]===undefined){
             return
@@ -180,6 +195,7 @@ export default function Timeline({goToLink, openMap}){
             <TimelineContainer>
                 <Title>
                     <h1>timeline</h1>
+                  
                 </Title> 
         
                     <TimelineContent>

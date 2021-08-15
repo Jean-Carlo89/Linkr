@@ -62,7 +62,7 @@ const GlobalStyle = createGlobalStyle`
 
     @media (max-width:1200px){
 
-
+    }
     
 `;
 export default GlobalStyle;
