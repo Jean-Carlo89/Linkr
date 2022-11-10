@@ -4,7 +4,7 @@
 ![Tux, linkr preview](./src/assets/linkr.gif)
 #### [Try it now!](https://linkr-sigma.vercel.app)
 ## About 🔎
-This is an web aplication made in contribution with [Laura](https://github.com/issitarual), [Lia](https://github.com/LiaXimenes) and [Thayaná](https://github.com/rabbithay/) wich lot of people can share their favorite websites and see what other users recommends. This project was made in two sprints based on agile mindset scrum.
+This is an web application made in contribution with [Laura](https://github.com/issitarual), [Lia](https://github.com/LiaXimenes) and [Thayaná](https://github.com/rabbithay/) wich lot of people can share their favorite websites and see what other users recommends. This project was made in two sprints based on agile mindset scrum.
 ### Implemented features ✅
 - [x] Sign up 
 - [x] Log in
